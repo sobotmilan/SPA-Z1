@@ -1,0 +1,25 @@
+Da li zelite pokrenuti simulaciju za putnicka ili za teretna vozila?
+==========================================
+1. Simulacija za putnicka
+2. Simulacija za teretna vozila
+K. Kraj rada
+==========================================
+Vas izbor: Putnicki placeholder.
+==========================================
+1. Simulacija za putnicka
+2. Simulacija za teretna vozila
+K. Kraj rada
+==========================================
+Vas izbor: Teretni placeholder.
+==========================================
+1. Simulacija za putnicka
+2. Simulacija za teretna vozila
+K. Kraj rada
+==========================================
+Vas izbor: Nevalidan unos! Molimo izaberite jednu od validnih ponuđenih opcija...
+==========================================
+1. Simulacija za putnicka
+2. Simulacija za teretna vozila
+K. Kraj rada
+==========================================
+Vas izbor: Kraj rada!
