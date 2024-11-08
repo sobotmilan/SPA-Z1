@@ -19,7 +19,7 @@ typedef struct qnode
 
 void simTeretni();
 QNODE *alokatorTeretni(TERETNO *);
-int pregledRobe(TERETNO *);
+int pregledRobe(TERETNO **);
 int put(QNODE **, QNODE **, TERETNO *);
 int get(QNODE **, QNODE **);
 int conflict(STEK *s, char *str);

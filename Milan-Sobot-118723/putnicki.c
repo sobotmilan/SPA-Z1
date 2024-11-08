@@ -7,7 +7,7 @@
 PUTNICKO *initializePutnicko(int *idGenerator)
 {
     PUTNICKO *local = (PUTNICKO *)malloc(sizeof(PUTNICKO));
-    local->id = *idGenerator++;          // bez obzira na to koliko cifara identifikator vozila sadržavao (5 cifara maksimalno), on će uvijek biti prikazan sa 5 cifara, jer ću u svakoj printf naredbi gdje se 'id' polje prikazuje koristiti %05d kao specifikator formata ispisa. dakle, 5-cifreni identifikatori!
+    local->id = (*idGenerator)++;        // bez obzira na to koliko cifara identifikator vozila sadržavao (5 cifara maksimalno), on će uvijek biti prikazan sa 5 cifara, jer ću u svakoj printf naredbi gdje se 'id' polje prikazuje koristiti %05d kao specifikator formata ispisa. dakle, 5-cifreni identifikatori!
     local->brPutnika = (rand() % 5) + 1; // 1-5 putnika generisanih
     local->putnici = (PUTNIK *)malloc(local->brPutnika * sizeof(PUTNIK));
     local->putnici[0].starost = (rand() % 82) + 18;
@@ -66,7 +66,7 @@ void simPutnicko()
     Da bih mogao koliko toliko ispratiti šta se dešava u realnom vremenu izvršavanja, dodajem ovu pauzu od 5 sekundi čisto da bih mogao prelistati konzolu i vidjeti šta je ispisano/generisano...
     */
     kontrolaPasosa(array, n);
-
+    printf("ZAVRSENA KONTROLA VOZILA!\n");
     free(array);
     /*
     Oslobadjanje memorije za svako putnicko vozilo individualno sam izvrsio na kraju funkcije 'pasosProces', tako sto sam vozila posmatrao prevashodno kao informacioni sadrzaj čvorova uredjene, jednostruko ulancane liste (kojom sam postigao efekat prioritetnog reda). Iz tog razloga, ovdje samo oslobadjam pokazivac na niz pokazivac (double pointer), pokazivaci - clanovi niza pokazivaca su oslobodjeni u 'pasosProces'...
