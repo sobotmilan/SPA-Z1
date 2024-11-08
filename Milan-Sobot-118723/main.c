@@ -2,14 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #include "putnicki.h"
-#include "teretni.c"
+#include "teretni.h"
 #include "putnik.h"
 
 int main()
 {
+    srand(time(NULL));
     printf("Da li zelite pokrenuti simulaciju za putnicka ili za teretna vozila?\n");
-    char unos;
+    char unos[5];
     do
     {
         printf("==========================================\n");
@@ -18,21 +20,21 @@ int main()
         printf("K. Kraj rada\n");
         printf("==========================================\n");
         printf("Vas izbor: ");
-        scanf(" %c", &unos);
-        if (unos == '1')
+        scanf(" %s", unos);
+        if (!strcmp(unos, "1"))
         {
-            printf("Putnicki placeholder.\n");
+            simPutnicko();
         }
-        else if (unos == '2')
+        else if (!strcmp(unos, "2"))
         {
             printf("Teretni placeholder.\n");
         }
-        else if (unos == 'k' || unos == 'K')
+        else if (!strcmp(unos, "k") || !strcmp(unos, "K"))
         {
             break;
         }
         else
-            printf("Nevalidan unos! Molimo izaberite jednu od validnih ponuđenih opcija...\n");
+            printf("Nevalidan unos! Molimo izaberite jednu od validnih ponudjenih opcija...\n");
     } while (1);
     printf("Kraj rada!\n");
     return 0;
