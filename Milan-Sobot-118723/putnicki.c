@@ -7,9 +7,8 @@
 PUTNICKO *initializePutnicko(int *idGenerator)
 {
     PUTNICKO *local = (PUTNICKO *)malloc(sizeof(PUTNICKO));
-    local->id = *idGenerator;                  // bez obzira na to koliko cifara identifikator vozila sadržavao (5 cifara maksimalno), on će uvijek biti prikazan sa 5 cifara, jer ću u svakoj printf naredbi gdje se 'id' polje prikazuje koristiti %05d kao specifikator formata ispisa. dakle, 5-cifreni identifikatori!
-    *idGenerator = (*idGenerator % 99999) + 1; // opet, ograničavam raspon generisanih identifikatora na maksimalno 5 cifara.
-    local->brPutnika = (rand() % 5) + 1;       // 1-5 putnika generisanih
+    local->id = *idGenerator++;          // bez obzira na to koliko cifara identifikator vozila sadržavao (5 cifara maksimalno), on će uvijek biti prikazan sa 5 cifara, jer ću u svakoj printf naredbi gdje se 'id' polje prikazuje koristiti %05d kao specifikator formata ispisa. dakle, 5-cifreni identifikatori!
+    local->brPutnika = (rand() % 5) + 1; // 1-5 putnika generisanih
     local->putnici = (PUTNIK *)malloc(local->brPutnika * sizeof(PUTNIK));
     local->putnici[0].starost = (rand() % 82) + 18;
     /*

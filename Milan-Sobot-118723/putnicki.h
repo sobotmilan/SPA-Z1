@@ -1,8 +1,5 @@
-#pragma once
 #include "putnik.h"
 #define MAX 100
-
-typedef struct node NODE;
 
 typedef struct putnicko
 {
@@ -16,7 +13,7 @@ typedef struct putnicko
 typedef struct node
 {
     PUTNICKO *content;
-    NODE *next;
+    struct node *next;
 } NODE;
 
 typedef struct red
@@ -31,8 +28,8 @@ void kontrolaPasosa(PUTNICKO **, int);
 int insertBefore(NODE *, PUTNICKO *);
 int insertAfter(NODE *, PUTNICKO *);
 int addSorted(NODE **, PUTNICKO *);
-NODE *alokator(PUTNICKO *);
+NODE *alokatorPutnicki(PUTNICKO *);
 void pasosProces(NODE **);
-int isEmpty(RED *);
+int isEmptyPutnicki(RED *);
 int enqueue(RED *, PUTNIK);
 int dequeue(RED *, PUTNIK *);

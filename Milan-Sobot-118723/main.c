@@ -27,7 +27,7 @@ int main()
         }
         else if (!strcmp(unos, "2"))
         {
-            printf("Teretni placeholder.\n");
+            simTeretni();
         }
         else if (!strcmp(unos, "k") || !strcmp(unos, "K"))
         {
