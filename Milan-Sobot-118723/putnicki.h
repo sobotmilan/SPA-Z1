@@ -25,8 +25,7 @@ typedef struct red
     int f, r;
 } RED;
 
-PUTNICKO *
-initializePutnicko();
+PUTNICKO *initializePutnicko(int *);
 void simPutnicko();
 void kontrolaPasosa(PUTNICKO **, int);
 int insertBefore(NODE *, PUTNICKO *);

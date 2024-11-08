@@ -4,13 +4,12 @@
 #include <time.h>
 #include <windows.h>
 
-PUTNICKO *initializePutnicko()
+PUTNICKO *initializePutnicko(int *idGenerator)
 {
-    static int idGenerator = 1; // static jer ćemo pamtiti vrijednost kroz pozive funkcije za svako naredno vozilo...
     PUTNICKO *local = (PUTNICKO *)malloc(sizeof(PUTNICKO));
-    local->id = idGenerator;                 // bez obzira na to koliko cifara identifikator vozila sadržavao (5 cifara maksimalno), on će uvijek biti prikazan sa 5 cifara, jer ću u svakoj printf naredbi gdje se 'id' polje prikazuje koristiti %05d kao specifikator formata ispisa. dakle, 5-cifreni identifikatori!
-    idGenerator = (idGenerator % 99999) + 1; // opet, ograničavam raspon generisanih identifikatora na maksimalno 5 cifara.
-    local->brPutnika = (rand() % 5) + 1;     // 1-5 putnika generisanih
+    local->id = *idGenerator;                  // bez obzira na to koliko cifara identifikator vozila sadržavao (5 cifara maksimalno), on će uvijek biti prikazan sa 5 cifara, jer ću u svakoj printf naredbi gdje se 'id' polje prikazuje koristiti %05d kao specifikator formata ispisa. dakle, 5-cifreni identifikatori!
+    *idGenerator = (*idGenerator % 99999) + 1; // opet, ograničavam raspon generisanih identifikatora na maksimalno 5 cifara.
+    local->brPutnika = (rand() % 5) + 1;       // 1-5 putnika generisanih
     local->putnici = (PUTNIK *)malloc(local->brPutnika * sizeof(PUTNIK));
     local->putnici[0].starost = (rand() % 82) + 18;
     /*
@@ -31,17 +30,21 @@ PUTNICKO *initializePutnicko()
 
 void simPutnicko()
 {
-    int n = (rand() % 100) + 1;
-    /*
-    Radi uštede vremena na testiranje programa, ograničio sam broj generisanih vozila na 1-100 raspon. Naravno, moguće je prosiriti, smanjiti ili potpuno ukloniti ovo ograničenje modifikacijom linije iznad ovog komentara...
-    */
+    printf("Unesite broj vozila koji ce se generisati u ovoj simulaciji: ");
+    int n;
+    do
+    {
+        scanf("%d", &n);
+    } while (n < 1 || n > 10000); // zadao sam neku smislenu gornju granicu...
+
+    static int idGenerator = 1; // statička promjenljiva koja će pamtiti vrijednost kroz pozive 'initializePutnicko' funkcije, ali će pritom da se resetuje nakon izvršenja brojačke petlje ispod komentara.
     PUTNICKO **array = (PUTNICKO **)malloc(n * sizeof(PUTNICKO *));
     for (int i = 0; i < n; i++)
-        *(array + i) = initializePutnicko();
+        *(array + i) = initializePutnicko(&idGenerator); // idGenerator se prenosi po adresi jer se njegova 'static' osobina odražava samo na simPutnicko (zbog scope-a promjenljive)
     /*
     Sve funkcije u ovom programu su napisane u redoslijedu u kom su poredane u ovom dokumentu, pa sam odlučio da alokaciju memorije u dinamičkoj zoni za svako putnicko vozilo pojedinačno vršim unutar funkcije 'initializePutnicko' (umjesto u ovoj brojačkoj petlji), pošto je ona svakako prva funkcija koju sam napisao u ovoj datoteci.
     */
-
+    idGenerator = 1;
     // Pokretanje simulacije...
     printf("========================================================================\n");
     printf("    Na granici se nalazi %d vozila! Podaci ovih vozila su sljedeci...\n", n);
