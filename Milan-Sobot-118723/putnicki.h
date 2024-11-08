@@ -19,11 +19,11 @@ typedef struct node
     NODE *next;
 } NODE;
 
-typedef struct bafer
+typedef struct red
 {
     PUTNIK *niz;
     int f, r;
-} BAFER;
+} RED;
 
 PUTNICKO *
 initializePutnicko();
@@ -33,7 +33,7 @@ int insertBefore(NODE *, PUTNICKO *);
 int insertAfter(NODE *, PUTNICKO *);
 int addSorted(NODE **, PUTNICKO *);
 NODE *alokator(PUTNICKO *);
-void pasosProces(PUTNICKO *);
-int isEmpty(BAFER *);
-int enqueue(BAFER *, PUTNIK);
-int dequeue(BAFER *, PUTNIK *);
+void pasosProces(NODE **);
+int isEmpty(RED *);
+int enqueue(RED *, PUTNIK);
+int dequeue(RED *, PUTNIK *);

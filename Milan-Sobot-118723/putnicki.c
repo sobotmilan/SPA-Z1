@@ -6,39 +6,51 @@
 
 PUTNICKO *initializePutnicko()
 {
-    static int idGenerator = 1; // static jer cemo pamtiti vrijednost kroz pozive funkcije za svako naredno vozilo...
+    static int idGenerator = 1; // static jer ćemo pamtiti vrijednost kroz pozive funkcije za svako naredno vozilo...
     PUTNICKO *local = (PUTNICKO *)malloc(sizeof(PUTNICKO));
-    local->id = idGenerator;                 // bez obzira na to koliko cifara identifikator vozila sadrzavao (5 cifara maksimalno), on ce uvijek biti prikazan sa 5 cifara, jer cu u svakoj printf naredbi gdje se 'id' polje prikazuje koristiti %05d kao specifikator formata ispisa. dakle, 5-cifreni identifikatori!
-    idGenerator = (idGenerator % 99999) + 1; // opet, ogranicavam raspon generisanih identifikatora na maksimalno 5 cifara.
+    local->id = idGenerator;                 // bez obzira na to koliko cifara identifikator vozila sadržavao (5 cifara maksimalno), on će uvijek biti prikazan sa 5 cifara, jer ću u svakoj printf naredbi gdje se 'id' polje prikazuje koristiti %05d kao specifikator formata ispisa. dakle, 5-cifreni identifikatori!
+    idGenerator = (idGenerator % 99999) + 1; // opet, ograničavam raspon generisanih identifikatora na maksimalno 5 cifara.
     local->brPutnika = (rand() % 5) + 1;     // 1-5 putnika generisanih
     local->putnici = (PUTNIK *)malloc(local->brPutnika * sizeof(PUTNIK));
-    for (int i = 0; i < local->brPutnika; i++)
-        local->putnici[i].starost = (rand() % 100) + 1; // 1-100 starost putnika...
+    local->putnici[0].starost = (rand() % 82) + 18;
+    /*
+    OBJASNJENJE: Prilikom testiranja programa, često mi se dešavalo da se za neko vozilo generiše samo jedan, maloljetni putnik, sto je nemoguće (protivzakonito), pa linijom 'local->putnici[0].starost = (rand() % 82) + 18;' generišem jednog putnika starosti 18-99 godina koji će biti 'vozač' (iako nidgje u programu on nije eksplicitno naznačen kao vozac), a zatim u brojačkoj petlji ispod generišem 'brPutnika-1' dodatnih 'saputnika' (naravno, ako je brPutnika == 1, brojačka petlja se nece izvrsiti...);
+    */
     local->brMaleDjece = 0;
     /*
-    inicijalizacija broja djece, u nastavku dodjela
+    inicijalizacija broja djece, u nastavku inkrementacija (ukoliko ih ima)
     */
-    for (int i = 0; i < local->brPutnika; i++)
+    for (int i = 1; i < local->brPutnika; i++)
+    {
+        local->putnici[i].starost = (rand() % 100) + 1; // 1-100 starost putnika...
         if (local->putnici[i].starost < 11)
             local->brMaleDjece++;
+    }
     return local;
 }
 
 void simPutnicko()
 {
-    int n = (rand() % 100) + 1; // radi ustede vremena, implementirana ogranicenja - br. vozila generisanih u simulaciji je 1-100.
+    int n = (rand() % 100) + 1;
+    /*
+    Radi uštede vremena na testiranje programa, ograničio sam broj generisanih vozila na 1-100 raspon. Naravno, moguće je prosiriti, smanjiti ili potpuno ukloniti ovo ograničenje modifikacijom linije iznad ovog komentara...
+    */
     PUTNICKO **array = (PUTNICKO **)malloc(n * sizeof(PUTNICKO *));
     for (int i = 0; i < n; i++)
         *(array + i) = initializePutnicko();
+    /*
+    Sve funkcije u ovom programu su napisane u redoslijedu u kom su poredane u ovom dokumentu, pa sam odlučio da alokaciju memorije u dinamičkoj zoni za svako putnicko vozilo pojedinačno vršim unutar funkcije 'initializePutnicko' (umjesto u ovoj brojačkoj petlji), pošto je ona svakako prva funkcija koju sam napisao u ovoj datoteci.
+    */
 
-    // run sim...
+    // Pokretanje simulacije...
     printf("========================================================================\n");
     printf("    Na granici se nalazi %d vozila! Podaci ovih vozila su sljedeci...\n", n);
     printf("========================================================================\n");
     for (int i = 0; i < n; i++)
     {
-        printf("ID VOZILA: %d\n", array[i]->id);
+        printf("ID VOZILA: %05d\n", array[i]->id);
         printf("BROJ PUTNIKA U VOZILU: %d\n", array[i]->brPutnika);
+        printf("BROJ MALE DJECE U VOZILU: %d\n", array[i]->brMaleDjece);
         for (int j = 0; j < array[i]->brPutnika; j++)
             printf("STAROST PUTNIKA %d: %d\n", j + 1, array[i]->putnici[j].starost);
         printf("\n\n");
@@ -48,15 +60,15 @@ void simPutnicko()
     printf("========================================================================\n");
     printf("Otvara se granicni prelaz, a prethodno ispisana vozila sada podlijezu granicnoj kontroli pasosa putnika...\n\n");
     Sleep(5000);
+    /*
+    Da bih mogao koliko toliko ispratiti šta se dešava u realnom vremenu izvršavanja, dodajem ovu pauzu od 5 sekundi čisto da bih mogao prelistati konzolu i vidjeti šta je ispisano/generisano...
+    */
     kontrolaPasosa(array, n);
 
-    for (int i = 0; i < n; i++)
-    {
-        free((*(array + i))->putnici);
-        free(*(array + i));
-    }
-
     free(array);
+    /*
+    Oslobadjanje memorije za svako putnicko vozilo individualno sam izvrsio na kraju funkcije 'pasosProces', tako sto sam vozila posmatrao prevashodno kao informacioni sadrzaj čvorova uredjene, jednostruko ulancane liste (kojom sam postigao efekat prioritetnog reda). Iz tog razloga, ovdje samo oslobadjam pokazivac na niz pokazivac (double pointer), pokazivaci - clanovi niza pokazivaca su oslobodjeni u 'pasosProces'...
+    */
 }
 
 void kontrolaPasosa(PUTNICKO **array, int n)
@@ -69,11 +81,10 @@ void kontrolaPasosa(PUTNICKO **array, int n)
             return;
         }
     Sleep(2000);
+    int numCtrl = 0;
     for (int i = 0; i < n; i++)
     {
-        printf("Kontrola %d. vozila:\n", i + 1);
-        pasosProces(array[i]);
-        printf("Zavrsena kontrola %d. vozila...\n\n", i + 1);
+        pasosProces(&head);
     }
 }
 
@@ -122,9 +133,9 @@ int addSorted(NODE **head, PUTNICKO *new)
     else
     {
         NODE *lister = *head;
-        while (lister->next && lister->content->brMaleDjece < new->brMaleDjece)
+        while (lister->next && lister->content->brMaleDjece > new->brMaleDjece)
             lister = lister->next;
-        if (lister->content->brMaleDjece < new->brMaleDjece)
+        if (lister->content->brMaleDjece > new->brMaleDjece || lister->content->brMaleDjece == new->brMaleDjece)
         {
             return insertAfter(lister, new);
         }
@@ -135,30 +146,41 @@ int addSorted(NODE **head, PUTNICKO *new)
     }
 }
 
-void pasosProces(PUTNICKO *trenutni)
+void pasosProces(NODE **head)
 {
+    if (*head == NULL)
+        return;
+    /*
+    Nisam uspio shvatiti zašto, ali bez ove if naredbe iznad komentara, funkcija 'pasosProces' se pozivala za 1 put više nego što vozila ima (čvorova u ulančanoj listi, sortiranoj po broju male djece u opadajućem redoslijedu), što je dovodilo do 'segmentation fault' na tom posljednjem, suvišnom pozivu i obaranju cijelog programa. Jako neelegantno rješenje kroz ovu if naredbu, ali drugog rješenja za sada nemam, niti razumijem zašto postoji taj jedan poziv viška...
+    */
+    printf("Kontrola vozila sa identifikatorom %05d:\n", (*head)->content->id);
     printf("Predaja pasosa...\n");
-    BAFER pasosi;
+    NODE *trenutni = *head;
+    *head = trenutni->next;
+    RED pasosi;
     pasosi.f = pasosi.r = 0;
-    pasosi.niz = (PUTNIK *)malloc(sizeof(PUTNIK) * trenutni->brPutnika);
-    for (int i = 0; i < trenutni->brPutnika; i++)
+    pasosi.niz = (PUTNIK *)malloc(sizeof(PUTNIK) * trenutni->content->brPutnika);
+    for (int i = 0; i < trenutni->content->brPutnika; i++)
     {
-        if (!enqueue(&pasosi, trenutni->putnici[i]))
+        if (!enqueue(&pasosi, trenutni->content->putnici[i]))
         {
             printf("NEUSPJESNA KONTROLA PASOSA!\n");
+            free(pasosi.niz);
             return;
         }
         else
         {
-            printf("Predat pasos putnika starog %d. godina!\n", trenutni->putnici[i].starost);
+            printf("Predat pasos putnika starog %d. godina!\n", trenutni->content->putnici[i].starost);
         }
     }
-    for (int i = 0; i < trenutni->brPutnika; i++)
+    printf("Pasosi predati! Pocetak kontrole...\n");
+    for (int i = 0; i < trenutni->content->brPutnika; i++)
     {
         PUTNIK retriever;
         if (!dequeue(&pasosi, &retriever))
         {
             printf("NEUSPJESNA KONTROLA PASOSA!\n");
+            free(pasosi.niz);
             return;
         }
         else
@@ -167,26 +189,29 @@ void pasosProces(PUTNICKO *trenutni)
             retriever.starost = 0;
         }
     }
+    printf("Zavrsena kontrola vozila sa identifikatorom %05d ...\n\n", trenutni->content->id);
+    free(pasosi.niz);
+    free(trenutni->content->putnici);
+    free(trenutni->content);
+    free(trenutni);
 }
 
-int isEmpty(BAFER *kb)
+int isEmpty(RED *kb)
 {
     return kb->f == kb->r;
 }
 
-int enqueue(BAFER *kb, PUTNIK novi)
+int enqueue(RED *kb, PUTNIK novi)
 {
-    kb->niz[kb->r] = novi;
-    kb->r++;
+    kb->niz[kb->r++] = novi;
     return 1;
 }
 
-int dequeue(BAFER *kb, PUTNIK *retriever)
+int dequeue(RED *kb, PUTNIK *retriever)
 {
     if (!isEmpty(kb))
     {
-        retriever->starost = kb->niz[kb->f].starost;
-        kb->f++;
+        *retriever = kb->niz[kb->f++];
         return 1;
     }
     else
