@@ -4,21 +4,21 @@
 #include <time.h>
 #include <windows.h>
 
-PUTNICKO *initializePutnicko(int *idGenerator)
+PUTNICKO *initializePutnicko(int *idGenerator) // idGenerator je proslijedjen po adresi, jer se inicijalizatorska funkcija poziva onoliko puta koliko vozila generišem, a neophodno mi je da on zadrži svoju vrijednost pri izlazu iz funkcije...
 {
     PUTNICKO *local = (PUTNICKO *)malloc(sizeof(PUTNICKO));
-    local->id = (*idGenerator)++;        // bez obzira na to koliko cifara identifikator vozila sadržavao (5 cifara maksimalno), on će uvijek biti prikazan sa 5 cifara, jer ću u svakoj printf naredbi gdje se 'id' polje prikazuje koristiti %05d kao specifikator formata ispisa. dakle, 5-cifreni identifikatori!
-    local->brPutnika = (rand() % 5) + 1; // 1-5 putnika generisanih
+    local->id = (*idGenerator)++;        // bez obzira na to koliko cifara identifikator vozila sadržavao (5 cifara maksimalno), on će uvijek biti prikazan sa 5 cifara, jer ću u svakoj printf naredbi gdje se 'id' polje prikazuje koristiti %05d kao specifikator formata ispisa. Ovime mogu imati teoretski 5-cifreni broj vozila...
+    local->brPutnika = (rand() % 5) + 1; // 1-5 putnika nasumično generisanih
     local->putnici = (PUTNIK *)malloc(local->brPutnika * sizeof(PUTNIK));
     local->putnici[0].starost = (rand() % 82) + 18;
     /*
-    OBJASNJENJE: Prilikom testiranja programa, često mi se dešavalo da se za neko vozilo generiše samo jedan, maloljetni putnik, sto je nemoguće (protivzakonito), pa linijom 'local->putnici[0].starost = (rand() % 82) + 18;' generišem jednog putnika starosti 18-99 godina koji će biti 'vozač' (iako nidgje u programu on nije eksplicitno naznačen kao vozac), a zatim u brojačkoj petlji ispod generišem 'brPutnika-1' dodatnih 'saputnika' (naravno, ako je brPutnika == 1, brojačka petlja se nece izvrsiti...);
+    OBJASNJENJE: Prilikom testiranja programa, često mi se dešavalo da se za neko vozilo generiše samo jedan, maloljetni putnik, sto je nemoguće (protivzakonito), pa linijom 'local->putnici[0].starost = (rand() % 82) + 18;' generišem jednog putnika starosti 18-99 godina koji će biti 'vozač' (iako nidgje u programu on nije, niti će biti eksplicitno naznačen kao vozac), a zatim u brojačkoj petlji ispod generišem 'brPutnika-1' dodatnih 'saputnika' (naravno, ako je brPutnika == 1, brojačka petlja se nece izvrsiti...);
     */
     local->brMaleDjece = 0;
     /*
-    inicijalizacija broja djece, u nastavku inkrementacija (ukoliko ih ima)
+    inicijalizacija broja male djece starosti 10 godina i manje, u nastavku inkrementacija te promjenljive (ukoliko ima djece)
     */
-    for (int i = 1; i < local->brPutnika; i++)
+    for (int i = 1; i < local->brPutnika; i++) // petlja kreće od 1 a ne 0 jer smo prvog putnika već alocirali! (local->putnici[0].starost=...)
     {
         local->putnici[i].starost = (rand() % 100) + 1; // 1-100 starost putnika...
         if (local->putnici[i].starost < 11)
@@ -34,28 +34,28 @@ void simPutnicko()
     do
     {
         scanf("%d", &n);
-    } while (n < 1 || n > 10000); // zadao sam neku smislenu gornju granicu...
+    } while (n < 1 || n > 99999); // pošto je identifikator petocifreni zbog ispisa u formatu %05d, ograničavam broj generisanih vozila na najveći petocifreni cijeli broj.
 
-    static int idGenerator = 1; // statička promjenljiva koja će pamtiti vrijednost kroz pozive 'initializePutnicko' funkcije, ali će pritom da se resetuje nakon izvršenja brojačke petlje ispod komentara.
+    int idGenerator = 1;
+    /*
+    promjenljiva koja će pamtiti vrijednost kroz pozive 'initializePutnicko' funkcije, ali će pritom da se resetuje nakon izlaza iz "simPutnicko" (time svakim narednim pokretanjem simulacije dodjela identifikatora kreće od 00001 opet, naravno ovo je moguće tako što idGenerator dobije prefiks "static", i time mu se proširi životni vijek, tako da više ne zavisi od "simPutnicko"...)
+    */
     PUTNICKO **array = (PUTNICKO **)malloc(n * sizeof(PUTNICKO *));
     for (int i = 0; i < n; i++)
-        *(array + i) = initializePutnicko(&idGenerator); // idGenerator se prenosi po adresi jer se njegova 'static' osobina odražava samo na simPutnicko (zbog scope-a promjenljive)
-    /*
-    Sve funkcije u ovom programu su napisane u redoslijedu u kom su poredane u ovom dokumentu, pa sam odlučio da alokaciju memorije u dinamičkoj zoni za svako putnicko vozilo pojedinačno vršim unutar funkcije 'initializePutnicko' (umjesto u ovoj brojačkoj petlji), pošto je ona svakako prva funkcija koju sam napisao u ovoj datoteci.
-    */
-    idGenerator = 1;
+        *(array + i) = initializePutnicko(&idGenerator);
+    // idGenerator se prenosi po adresi jer želim da se promjena nelokalnog stanja (bočni efekat) odrazi na dodjelu identifikatora za naredno vozilo!
     // Pokretanje simulacije...
     printf("========================================================================\n");
     printf("    Na granici se nalazi %d vozila! Podaci ovih vozila su sljedeci...\n", n);
     printf("========================================================================\n");
+    printf("ID      BROJ PUTNIKA    BROJ MALE DJECE     STAROST PUTNIKA\n");
+    printf("========================================================================\n");
     for (int i = 0; i < n; i++)
     {
-        printf("ID VOZILA: %05d\n", array[i]->id);
-        printf("BROJ PUTNIKA U VOZILU: %d\n", array[i]->brPutnika);
-        printf("BROJ MALE DJECE U VOZILU: %d\n", array[i]->brMaleDjece);
+        printf("%05d   %-16d%-20d", array[i]->id, array[i]->brPutnika, array[i]->brMaleDjece);
         for (int j = 0; j < array[i]->brPutnika; j++)
-            printf("STAROST PUTNIKA %d: %d\n", j + 1, array[i]->putnici[j].starost);
-        printf("\n\n");
+            printf("%-d ", array[i]->putnici[j].starost);
+        printf("\n");
     }
     printf("========================================================================\n");
     printf("                         KRAJ SPISKA VOZILA!\n");
@@ -69,85 +69,63 @@ void simPutnicko()
     printf("ZAVRSENA KONTROLA VOZILA!\n");
     free(array);
     /*
-    Oslobadjanje memorije za svako putnicko vozilo individualno sam izvrsio na kraju funkcije 'pasosProces', tako sto sam vozila posmatrao prevashodno kao informacioni sadrzaj čvorova uredjene, jednostruko ulancane liste (kojom sam postigao efekat prioritetnog reda). Iz tog razloga, ovdje samo oslobadjam pokazivac na niz pokazivac (double pointer), pokazivaci - clanovi niza pokazivaca su oslobodjeni u 'pasosProces'...
+    Oslobadjanje memorije za svako putnicko vozilo individualno sam izvrsio na kraju funkcije 'pasosProces', tako sto sam vozila posmatrao prevashodno kao informacioni sadrzaj čvorova uređene, jednostruko ulančane liste (kojom sam postigao efekat prioritetnog reda). Iz tog razloga, ovdje samo oslobadjam pokazivač na pokazivač (double pointer), pokazivači - članovi niza pokazivaca su oslobodjeni u 'pasosProces'...
     */
 }
 
 void kontrolaPasosa(PUTNICKO **array, int n)
 {
-    NODE *head = NULL;
+    NODE *head = NULL; // glava liste koja vrši funkciju prioritetnog reda...
     for (int i = 0; i < n; i++)
         if (!addSorted(&head, array[i]))
         {
-            printf("PREKID KONTROLE PASOSA!\nPRIVREMENA OBUSTAVA RADA!\n");
+            printf("PREKID KONTROLE PASOSA!\nPRIVREMENA OBUSTAVA RADA!\n"); // za svaki slučaj imam nasilan izlaz iz programa, prevashodno da se greške mogu debuggovati lakše.
             return;
         }
-    Sleep(2000);
-    int numCtrl = 0;
     for (int i = 0; i < n; i++)
-    {
         pasosProces(&head);
-    }
+    /*
+    ovo je u sustini samo nekakva "handler" funkcija koja vrši inicijalizaciju glave liste, a sve ostale procese (operacije dodavanja u listu, kao i kontrole pasoša) delegira na "helper" funkcije koje poziva kroz dvije različite brojačke petlje...
+    */
 }
 
-NODE *alokator(PUTNICKO *info)
+NODE *alokator(PUTNICKO *info) //"helper" funkcija koja radi posao alociranja dinamičke memorije, te dodjeljivanja proslijeđene strukture putničkog vozila...
 {
     NODE *new = (NODE *)malloc(sizeof(NODE));
     if (new == NULL)
         return NULL; // safeguard mehanizmi...
     new->content = info;
     if (new->content == NULL)
+    {
+        free(new);
         return NULL; // safeguard mehanizmi...
+    }
     new->next = NULL;
     return new;
 }
 
-int insertBefore(NODE *target, PUTNICKO *new)
-{
-    if (target == NULL || new == NULL)
-        return 0;
-    NODE *newNode = alokator(target->content);
-    if (newNode == NULL)
-        return 0;
-    newNode->next = target;
-    target->content = new;
-    return 1;
-}
-int insertAfter(NODE *target, PUTNICKO *new)
+int addSorted(NODE **head, PUTNICKO *new)
 {
     NODE *newNode = alokator(new);
     if (newNode == NULL)
         return 0;
-    newNode->next = target->next;
-    target->next = newNode;
-    return 1;
-}
 
-int addSorted(NODE **head, PUTNICKO *new)
-{
-    if (new == NULL)
-        return 0; // greska pri prosljedjivanju...
-    if (*head == NULL)
+    if (*head == NULL || (*head)->content->brMaleDjece < new->brMaleDjece)
     {
-        *head = alokator(new);
-        return (*head != NULL);
+        newNode->next = *head;
+        *head = newNode;
     }
     else
     {
-        NODE *lister = *head;
-        while (lister->next && lister->content->brMaleDjece > new->brMaleDjece)
-            lister = lister->next;
-        if (lister->content->brMaleDjece > new->brMaleDjece || lister->content->brMaleDjece == new->brMaleDjece)
-        {
-            return insertAfter(lister, new);
-        }
-        else
-        {
-            return insertBefore(lister, new);
-        }
-    }
-}
+        NODE *current = *head;
+        while (current->next != NULL && (current->next)->content->brMaleDjece >= new->brMaleDjece)
+            current = current->next;
 
+        newNode->next = current->next;
+        current->next = newNode;
+    }
+    return 1;
+}
 void pasosProces(NODE **head)
 {
     if (*head == NULL)

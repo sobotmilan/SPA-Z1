@@ -9,9 +9,9 @@
 
 int main()
 {
-    srand(time(NULL));
+    srand(time(NULL)); // postavljanje nasumičnog generatora za upotrebu rand() funkcije, ove funkcije su demonstrirane na laboratorijskoj vježbi kursa C programiranja na prvoj godini
     printf("Da li zelite pokrenuti simulaciju za putnicka ili za teretna vozila?\n");
-    char unos[5];
+    char unos[2]; //"input buffer" nosi 2 karaktera: slovo izbora + '\0'...
     do
     {
         printf("==========================================\n");
@@ -20,7 +20,8 @@ int main()
         printf("K. Kraj rada\n");
         printf("==========================================\n");
         printf("Vas izbor: ");
-        scanf(" %s", unos);
+        fflush(stdin); // sigurnosna metoda u slučaju da neki karakter,simbol ili terminator "ostane" iz prošlog unosa...
+        scanf("%s", unos);
         if (!strcmp(unos, "1"))
         {
             simPutnicko();
@@ -35,7 +36,7 @@ int main()
         }
         else
             printf("Nevalidan unos! Molimo izaberite jednu od validnih ponudjenih opcija...\n");
-    } while (1);
+    } while (1); // nemam konkretan uslov za izlaz iz petlje jer već imam "break" uslov ukoliko "unos" == "K" || "unos" == "k"...
     printf("Kraj rada!\n");
     return 0;
 }

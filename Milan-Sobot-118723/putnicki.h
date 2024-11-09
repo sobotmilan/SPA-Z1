@@ -27,8 +27,6 @@ typedef struct red
 PUTNICKO *initializePutnicko(int *); // funkcija koja inicijalizuje jedno vozilo koristeci PUTNICKO strukturu
 void simPutnicko();                  // funkcija koja se poziva u main-u, sa njom započinje i završava simulacija...
 void kontrolaPasosa(PUTNICKO **, int);
-int insertBefore(NODE *, PUTNICKO *);
-int insertAfter(NODE *, PUTNICKO *);
 int addSorted(NODE **, PUTNICKO *); // funkcija kojom se postiže prioritetni red
 NODE *alokatorPutnicki(PUTNICKO *); // funkcija koja vodi brigu o alokaciji memorije za čvor ulančane liste
 void pasosProces(NODE **);

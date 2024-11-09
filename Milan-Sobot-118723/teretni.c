@@ -65,7 +65,7 @@ void simTeretni()
     printf("====================================================================\n");
     printf("    Uspjesno je generisano %d vozila! Pocinje parkiranje vozila:\n", n);
     printf("====================================================================\n");
-    printf("ID        ROBA\n");
+    printf("ID        REDOSLIJED UTOVARA ROBE\n");
     printf("====================================================================\n");
     QNODE *front = NULL;
     QNODE *rear = NULL;
