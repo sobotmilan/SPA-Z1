@@ -1,5 +1,4 @@
 #include "putnik.h"
-#define MAX 100
 
 typedef struct putnicko
 {
@@ -15,20 +14,23 @@ typedef struct node
     PUTNICKO *content;
     struct node *next;
 } NODE;
+/*
+ovom NODE strukturom predstavljen je jedan čvor jednostruko ulančane liste, koja je iskorištena kao implementacija prioritetnog reda...
+*/
 
 typedef struct red
 {
     PUTNIK *niz;
     int f, r;
-} RED;
+} RED; // implementacija sekvencijalnog reda, iskorištenog za kontrolu pasoša...
 
-PUTNICKO *initializePutnicko(int *);
-void simPutnicko();
+PUTNICKO *initializePutnicko(int *); // funkcija koja inicijalizuje jedno vozilo koristeci PUTNICKO strukturu
+void simPutnicko();                  // funkcija koja se poziva u main-u, sa njom započinje i završava simulacija...
 void kontrolaPasosa(PUTNICKO **, int);
 int insertBefore(NODE *, PUTNICKO *);
 int insertAfter(NODE *, PUTNICKO *);
-int addSorted(NODE **, PUTNICKO *);
-NODE *alokatorPutnicki(PUTNICKO *);
+int addSorted(NODE **, PUTNICKO *); // funkcija kojom se postiže prioritetni red
+NODE *alokatorPutnicki(PUTNICKO *); // funkcija koja vodi brigu o alokaciji memorije za čvor ulančane liste
 void pasosProces(NODE **);
 int isEmptyPutnicki(RED *);
 int enqueue(RED *, PUTNIK);

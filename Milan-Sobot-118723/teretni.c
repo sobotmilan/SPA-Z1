@@ -1,9 +1,7 @@
 #include "teretni.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <string.h>
-#include <windows.h>
 
 void simTeretni()
 {
@@ -13,25 +11,49 @@ void simTeretni()
     {
         scanf("%d", &n);
     } while (n < 1 || n > 10000); // racionalna gornja granica
+
     FILE *listaRobe;
     listaRobe = fopen("roba.txt", "r");
+    /*
+    NAPOMENA: UVIJEK PROSLIJEDITI SPISAK ROBE KAO DOKUMENT SA NAZIVOM 'ROBA.TXT', I SMJESTITI GA U ISTI DIREKTORIJUM U KOM SE NALAZI IZVRŠNA DATOTEKA PROGRAMA!
+    */
 
     if (listaRobe == NULL)
     {
         printf("Neuspjesno otvaranje datoteke za citanje spiska robe...\n");
-        return;
+        return; // nasilni kraj izvrsavanja ukoliko se datoteka ne moze otvoriti...
     }
-    static int idGenerator = 1; // statička promjenljiva koja će pamtiti vrijednost kroz pozive 'initializeTeretno' funkcije, ali će pritom da se resetuje nakon izvršenja brojačke petlje ispod komentara.
+
+    static int idGenerator = 1; // statička promjenljiva koja će pamtiti vrijednost ID-a kroz pozive 'initializeTeretno' funkcije, ali će pritom da se resetuje nakon izvršenja brojačke petlje ispod komentara.
+
     char **artikli = (char **)malloc(INT_MAX * sizeof(char *));
+    /*
+    pokazivač na niz pokazivača na podatak tipa char, suštinski dinamički alociran niz stringova koji će pročitati sve artikle iz datoteke i smjestiti ih u memoriju, time smanjuje broj pristupa datoteci u spoljašnjoj memoriji, a nazive artikala "seli" u radnu memoriju (efikasniji pristup listi artikala)...
+    */
+
     if (artikli == NULL)
-        return;
-    char buffer[256]; // sumnjam da postoji artikl koji u nazivu nosi 255 slova...
-    int i = 0;
-    while (fscanf(listaRobe, "%s\n", buffer) != EOF)
     {
+        printf("Neuspjesno citanje ulazne datoteke...\n");
+        fclose(listaRobe);
+        return; // ukoliko alokacija iznad ne uspije, nasilno izlazimo iz programa...
+    }
+
+    char buffer[256]; // sumnjam da postoji artikl koji u nazivu nosi 255 slova...
+    int i = 0;        // i = broj artikala procitanih iz datoteke 'roba.txt'
+
+    while (fgets(buffer, sizeof(buffer), listaRobe) != NULL)
+    /*
+    NAPOMENA: Pretpostavljam da se
+    */
+    {
+        int len = strlen(buffer);
+        if (buffer[len - 1] == '\n')
+            buffer[len - 1] = '\0';
         artikli[i] = (char *)malloc((strlen(buffer) + 1) * sizeof(char));
+        // alokacija memorije za svaki clan niza (svaki artikal pojedinacno)...
+
         if (artikli[i] == NULL)
-            return;
+            return; // opet, provjera pravilne alokacije memorije za individualne stringove...
         strcpy(artikli[i], buffer);
         i++;
     }
@@ -138,7 +160,7 @@ int get(QNODE **front, QNODE **rear)
 }
 int conflict(STEK *s, char *str)
 {
-    for (int i = 0; i < s->tos; i++)
+    for (int i = 0; i < s->tos + 1; i++)
     {
         if (s->niz[i])
             if (!strcmp(s->niz[i], str))
